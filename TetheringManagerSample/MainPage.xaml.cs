@@ -30,14 +30,14 @@ namespace TetheringManagerSample
         }
         
         /// <summary>
-        /// 
+        /// アクセスポイントの構成を行いテザリングを開始する
         /// </summary>
         /// <remarks>
         /// The required device capability has not been declared in the manifest.
         /// </remarks>
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var tetheringManage = NetworkOperatorTetheringManager.CreateFromConnectionProfile(
+            var tetheringManager = NetworkOperatorTetheringManager.CreateFromConnectionProfile(
                                         NetworkInformation.GetInternetConnectionProfile()
                                         );
             
@@ -48,7 +48,9 @@ namespace TetheringManagerSample
                 Ssid = AP_SSID, Passphrase = AP_PASS
             };
             
-            await tetheringManage.ConfigureAccessPointAsync(accessPointConfig);
+            await tetheringManager.ConfigureAccessPointAsync(accessPointConfig);
+            
+            await tetheringManager.StartTetheringAsync();
         }
     }
 }
