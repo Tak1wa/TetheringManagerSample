@@ -28,7 +28,9 @@ namespace TetheringManagerSample
         {
             this.InitializeComponent();
         }
-        
+
+        private NetworkOperatorTetheringManager tetheringManager = null;
+
         /// <summary>
         /// アクセスポイントの構成を行いテザリングを開始する
         /// </summary>
@@ -37,20 +39,25 @@ namespace TetheringManagerSample
         /// </remarks>
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var tetheringManager = NetworkOperatorTetheringManager.CreateFromConnectionProfile(
+            tetheringManager = NetworkOperatorTetheringManager.CreateFromConnectionProfile(
                                         NetworkInformation.GetInternetConnectionProfile()
                                         );
             
-            string AP_SSID = txtSSID.Text;
-            string AP_PASS = txtPASS.Text;
+            string apSsid = txtSSID.Text;
+            string apPass = txtPASS.Text;
             var accessPointConfig = new NetworkOperatorTetheringAccessPointConfiguration()
             {
-                Ssid = AP_SSID, Passphrase = AP_PASS
+                Ssid = apSsid, Passphrase = apPass
             };
             
             await tetheringManager.ConfigureAccessPointAsync(accessPointConfig);
             
             await tetheringManager.StartTetheringAsync();
+        }
+
+        private async void Button2_Click(object sender, RoutedEventArgs e)
+        {
+            await tetheringManager.StopTetheringAsync();
         }
     }
 }

@@ -12,9 +12,11 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <TextBox Grid.Row="0" Name="txtSSID" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <TextBox Grid.Row="1" Name="txtPASS" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <Button Grid.Row="2" Content="Connect" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button_Click" />
+        <Button Grid.Row="3" Content="Disconnect" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Button2_Click" />
     </Grid>
 </Page>
