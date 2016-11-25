@@ -49,7 +49,7 @@ namespace TetheringManagerSample
             {
                 Ssid = apSsid, Passphrase = apPass
             };
-            
+
             await tetheringManager.ConfigureAccessPointAsync(accessPointConfig);
             
             await tetheringManager.StartTetheringAsync();
@@ -57,6 +57,10 @@ namespace TetheringManagerSample
 
         private async void Button2_Click(object sender, RoutedEventArgs e)
         {
+            tetheringManager = NetworkOperatorTetheringManager.CreateFromConnectionProfile(
+                                        NetworkInformation.GetInternetConnectionProfile()
+                                        );
+            tetheringManager.GetCurrentAccessPointConfiguration();
             await tetheringManager.StopTetheringAsync();
         }
     }
