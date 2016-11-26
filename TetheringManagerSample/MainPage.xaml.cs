@@ -29,19 +29,24 @@ namespace TetheringManagerSample
             this.InitializeComponent();
         }
 
-        private NetworkOperatorTetheringManager tetheringManager = null;
+        private DispatcherTimer _timer;
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(1);
+            _timer.Tick += (_1, _2) =>
+            {
+                UpdateTetheringStatus();
+            };
+            _timer.Start();
+        }
 
-        /// <summary>
-        /// アクセスポイントの構成を行いテザリングを開始する
-        /// </summary>
         /// <remarks>
         /// The required device capability has not been declared in the manifest.
         /// </remarks>
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void Connect_Click(object sender, RoutedEventArgs e)
         {
-            tetheringManager = NetworkOperatorTetheringManager.CreateFromConnectionProfile(
-                                        NetworkInformation.GetInternetConnectionProfile()
-                                        );
+            var tetheringManager = GetCurrentTetheringManage();
             
             string apSsid = txtSSID.Text;
             string apPass = txtPASS.Text;
@@ -49,19 +54,50 @@ namespace TetheringManagerSample
             {
                 Ssid = apSsid, Passphrase = apPass
             };
-
             await tetheringManager.ConfigureAccessPointAsync(accessPointConfig);
-            
             await tetheringManager.StartTetheringAsync();
+
+            UpdateTetheringStatus();
         }
 
-        private async void Button2_Click(object sender, RoutedEventArgs e)
+        private async void Disconnect_Click(object sender, RoutedEventArgs e)
         {
-            tetheringManager = NetworkOperatorTetheringManager.CreateFromConnectionProfile(
+            var tetheringManager = GetCurrentTetheringManage();
+
+            tetheringManager?.GetCurrentAccessPointConfiguration();
+            await tetheringManager?.StopTetheringAsync();
+
+            UpdateTetheringStatus();
+        }
+        
+        #region Private Method
+
+        private NetworkOperatorTetheringManager GetCurrentTetheringManage()
+        {
+            return NetworkOperatorTetheringManager.CreateFromConnectionProfile(
                                         NetworkInformation.GetInternetConnectionProfile()
                                         );
-            tetheringManager.GetCurrentAccessPointConfiguration();
-            await tetheringManager.StopTetheringAsync();
         }
+
+        private int currentClientCount;
+        private int maxClientCount;
+
+        private void UpdateTetheringStatus()
+        {
+            var tetheringManager = GetCurrentTetheringManage();
+            lblState.Text = tetheringManager?.TetheringOperationalState.ToString();
+
+            maxClientCount = (int)tetheringManager.MaxClientCount;
+            currentClientCount = (int)tetheringManager.ClientCount;
+            lblClients.Text = $"{currentClientCount} / {maxClientCount}";
+
+            listClients.Items.Clear();
+            foreach(var currentClient in tetheringManager.GetTetheringClients().Select(c => $"{c.HostNames.ToString()} {c.MacAddress.ToString()}"))
+            {
+                listClients.Items.Add(currentClient);
+            }
+        }
+
+        #endregion
     }
 }
